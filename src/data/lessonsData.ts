@@ -464,7 +464,10 @@ Key commands:
           branch: 'main',
         },
       },
-      workingDirectory: { 'index.html': '<h1>Home</h1>' },
+      workingDirectory: {
+        'index.html': '<h1>Home</h1>',
+        'dark-theme.css': 'body.dark { background: #0d1117; color: #c9d1d9; }\n',
+      },
       stagedFiles: {},
     }),
     exercises: [
@@ -496,11 +499,11 @@ Key commands:
       {
         id: 'ex-6-commit',
         title: 'Task 3: Commit on Feature Branch',
-        instruction: 'Stage and commit a new feature: run `git commit -m "Add dark theme styles"` (files will be auto-staged for you or use `git add .` first).',
+        instruction: 'Stage and commit your new dark theme feature: run `git commit -m "Add dark theme styles"` (or stage with `git add .` first).',
         type: 'terminal',
         solutionCommand: 'git commit -m "Add dark theme styles"',
         hints: [
-          'Try: git commit -m "Add dark theme styles"',
+          'You can stage with `git add .` or commit directly with: git commit -m "Add dark theme styles"',
         ],
         solutionExplanation: 'Look at the visual graph: the feature branch branched off and moved ahead of main!',
         validator: (state) => {
@@ -904,7 +907,11 @@ Behind the scenes: \`git pull\` = \`git fetch\` (download data) + \`git merge\` 
           author: 'Lead Dev <lead@company.com>',
         },
       },
-      workingDirectory: { 'index.html': '<h1>Production App</h1>', 'README.md': '# Project' },
+      workingDirectory: {
+        'index.html': '<h1>Production App</h1>',
+        'README.md': '# Project',
+        'profile.js': 'export function renderProfile() { return "<div class=\\"profile\\">Profile</div>"; }\n',
+      },
       stagedFiles: {},
       remotes: {
         origin: {
@@ -1016,7 +1023,7 @@ Your Mission Checklist:
       },
       workingDirectory: {
         'index.html': '<h1>StartupX</h1>',
-        'onboarding.js': '// Onboarding v1\nfunction step3() {\n  return "require_email_code";\n}\n',
+        'onboarding.js': '// Onboarding v1\nfunction step3() {\n  return "validated_phone_and_email";\n}\n',
       },
       stagedFiles: {},
       remotes: {
