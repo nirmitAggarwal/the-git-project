@@ -91,3 +91,25 @@ You can visit `http://localhost:5173/#/verify` or click the `/verify` button in 
 npm run build
 ```
 The compiled bundle will be in `dist/`.
+
+---
+
+## ⚙️ Environment Configuration (Migration / Hosting)
+
+Deployment-specific values live in environment variables instead of the code:
+
+| Variable | Purpose |
+| --- | --- |
+| `VITE_SITE_URL` | The canonical "main link" of the deployed site. Used for certificate verification URLs and QR codes. Falls back to the current browser origin when unset. |
+| `VITE_VERIFICATION_SALT` | Secret salt used to sign and verify course-completion tokens. Changing it invalidates previously issued tokens. |
+
+### Local development
+
+1. Copy the template: `cp .env.example .env`
+2. Fill in your values. `.env` is gitignored — never commit it.
+
+### Hosting (Vercel / Netlify / CI)
+
+Because this is a static Vite build, set these as **build-time environment variables** (or secrets) in your hosting dashboard, then redeploy. `VITE_*` variables are inlined into the bundle at build time.
+
+> ⚠️ Note: `VITE_*` variables are public by design (they ship in the JS bundle). The verification salt here only guards the token checksum — if you later need true secrecy, move token signing to a serverless function and keep the salt as a server-only secret.
