@@ -1,4 +1,5 @@
 import { VerificationPayload, VerificationResult } from '../types/verification';
+import { VERIFICATION_SALT } from '../config/env';
 
 // Deterministic cryptographic hash function (SHA-256 via SubtleCrypto or robust fallback)
 async function sha256(message: string): Promise<string> {
@@ -18,8 +19,8 @@ async function sha256(message: string): Promise<string> {
   return Math.abs(hash).toString(16).padStart(8, '0');
 }
 
-// Fixed salt / course salt (organizer verification format)
-const COURSE_SECRET_SALT = 'GIT_GITHUB_GAME_PROD_VERIFY_SALT_2026';
+// Secret salt sourced from the environment (see .env / hosting build secrets).
+const COURSE_SECRET_SALT = VERIFICATION_SALT;
 
 export async function generateVerificationToken(data: Omit<VerificationPayload, 'checksum'>): Promise<string> {
   const canonicalString = `${data.name.trim().toLowerCase()}|${data.email.trim().toLowerCase()}|${data.completedAt}|${data.courseVersion}|${data.scorePercentage}|${data.completedLessonsCount}|${COURSE_SECRET_SALT}`;

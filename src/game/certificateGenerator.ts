@@ -2,6 +2,7 @@ import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 import { VerificationPayload } from '../types/verification';
 import { CERTIFICATE_CONFIG } from '../data/certificateData';
+import { buildVerifyUrl as buildEnvVerifyUrl } from '../config/env';
 
 // A4 landscape dimensions in millimetres.
 const PAGE_W = 297;
@@ -27,10 +28,7 @@ const COLORS = {
  * link works no matter which path the app is served from.
  */
 export function buildVerifyUrl(token: string): string {
-  const fallback = `https://git-github-game.local/#/verify?token=${encodeURIComponent(token)}`;
-  if (typeof window === 'undefined') return fallback;
-  const base = `${window.location.origin}${window.location.pathname}`;
-  return `${base}#/verify?token=${encodeURIComponent(token)}`;
+  return buildEnvVerifyUrl(token);
 }
 
 function formatDate(timestamp: number): string {
