@@ -45,7 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <div>
             <div className="font-bold text-white text-sm tracking-tight flex items-center space-x-1.5 font-sans">
               <span>GIT &amp; GITHUB GAME</span>
-              <span className="text-[10px] bg-[#21262d] text-[#2ea043] px-1.5 py-0.2 rounded border border-[#30363d]">
+              <span className="text-[10px] bg-[#21262d] text-[#2ea043] px-1.5 py-0.5 rounded border border-[#30363d]">
                 MVP
               </span>
             </div>

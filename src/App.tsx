@@ -15,6 +15,26 @@ import confetti from 'canvas-confetti';
 
 const STORAGE_KEY = 'git_github_game_user_progress_v1';
 
+// Reads a verification token embedded in the URL (?token=... or #/verify?token=...).
+// Used by the QR code printed on the downloaded certificate.
+function readVerifyTokenFromUrl(): string {
+  if (typeof window === 'undefined') return '';
+  const fromSearch = new URLSearchParams(window.location.search).get('token');
+  if (fromSearch) return fromSearch;
+  const hash = window.location.hash;
+  const queryIndex = hash.indexOf('?');
+  if (queryIndex !== -1) {
+    const fromHash = new URLSearchParams(hash.slice(queryIndex + 1)).get('token');
+    if (fromHash) return fromHash;
+  }
+  return '';
+}
+
+function isVerifyRoute(): boolean {
+  if (typeof window === 'undefined') return false;
+  return window.location.pathname === '/verify' || window.location.hash.startsWith('#/verify');
+}
+
 const defaultProgress: UserProgress = {
   name: '',
   email: '',
@@ -42,7 +62,7 @@ export const App: React.FC = () => {
 
   // Simple client-side router
   const [route, setRoute] = useState<'landing' | 'dashboard' | 'lesson' | 'certificate' | 'verify'>(() => {
-    if (typeof window !== 'undefined' && (window.location.pathname === '/verify' || window.location.hash === '#/verify')) {
+    if (isVerifyRoute()) {
       return 'verify';
     }
     try {
@@ -60,6 +80,7 @@ export const App: React.FC = () => {
   const [currentLessonId, setCurrentLessonId] = useState<number>(() => progress.currentLessonId || 1);
   const [verificationPayload, setVerificationPayload] = useState<VerificationPayload | null>(null);
   const [verificationToken, setVerificationToken] = useState<string>('');
+  const [sharedVerifyToken, setSharedVerifyToken] = useState<string>(() => readVerifyTokenFromUrl());
 
   // Persist progress changes to localStorage
   useEffect(() => {
@@ -73,7 +94,8 @@ export const App: React.FC = () => {
   // Handle URL hash changes (e.g. #/verify)
   useEffect(() => {
     const handleHashChange = () => {
-      if (window.location.hash === '#/verify') {
+      if (isVerifyRoute()) {
+        setSharedVerifyToken(readVerifyTokenFromUrl());
         setRoute('verify');
       }
     };
@@ -109,11 +131,13 @@ export const App: React.FC = () => {
     const payloadData: Omit<VerificationPayload, 'checksum'> = {
       name: progress.name || 'Developer',
       email: progress.email || 'developer@gitgame.io',
-      courseName: 'Git & GitHub Game: Master Curriculum',
+      courseName: 'Git & GitHub Course',
       courseVersion: 'v1.0.0-mvp',
       completedAt,
       scorePercentage,
-      xp: progress.xp + 500, // Graduation bonus XP!
+      // Graduation bonus XP — only awarded the first time the curriculum completes,
+      // so re-viewing the certificate after a page reload doesn't inflate XP.
+      xp: progress.xp + (progress.completedAt ? 0 : 500),
       completedLessonsCount: 12,
       totalLessonsCount: 12,
       finalChallengeStatus: 'Passed',
@@ -134,7 +158,7 @@ export const App: React.FC = () => {
 
     setProgress(prev => ({
       ...prev,
-      xp: prev.xp + 500,
+      xp: progress.completedAt ? prev.xp : prev.xp + 500,
       completedAt,
       verificationCode: token,
       unlockedBadges: newBadges,
@@ -242,7 +266,7 @@ export const App: React.FC = () => {
       {route === 'verify' && (
         <VerifyPage
           onBackToApp={() => setRoute(progress.name ? 'dashboard' : 'landing')}
-          defaultToken={verificationToken}
+          defaultToken={verificationToken || sharedVerifyToken}
         />
       )}
     </div>

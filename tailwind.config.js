@@ -33,6 +33,7 @@ export default {
         'glow-green': '0 0 15px rgba(35, 134, 54, 0.4)',
         'glow-blue': '0 0 15px rgba(88, 166, 255, 0.3)',
         'glow-purple': '0 0 15px rgba(188, 140, 255, 0.3)',
+        'glow-yellow': '0 0 15px rgba(210, 153, 34, 0.45)',
       }
     },
   },

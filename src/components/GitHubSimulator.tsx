@@ -61,7 +61,7 @@ export const GitHubSimulator: React.FC<GitHubSimulatorProps> = ({ repoState, onP
             <span className="text-[#8b949e]">/</span>
             <span className="text-[#58a6ff] font-bold hover:underline cursor-pointer">nirmit-demo</span>
           </div>
-          <span className="bg-[#21262d] text-[#8b949e] px-1.5 py-0.2 rounded-full text-[10px] border border-[#30363d]">
+          <span className="bg-[#21262d] text-[#8b949e] px-1.5 py-0.5 rounded-full text-[10px] border border-[#30363d]">
             Public
           </span>
         </div>
@@ -221,7 +221,7 @@ export const GitHubSimulator: React.FC<GitHubSimulatorProps> = ({ repoState, onP
               <div className="flex items-center space-x-2">
                 <GitBranch className="w-3.5 h-3.5 text-[#2ea043]" />
                 <span className="text-white font-bold">main</span>
-                <span className="bg-[#21262d] text-[#2ea043] px-1.5 py-0.2 rounded text-[10px]">default</span>
+                <span className="bg-[#21262d] text-[#2ea043] px-1.5 py-0.5 rounded text-[10px]">default</span>
               </div>
               <span className="text-[#8b949e] text-[10px]">Updated recently</span>
             </div>

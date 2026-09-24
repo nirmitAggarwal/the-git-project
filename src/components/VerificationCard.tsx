@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { VerificationPayload } from '../types/verification';
-import { Award, CheckCircle, Copy, ExternalLink, Printer, ShieldCheck } from 'lucide-react';
+import { Award, CheckCircle, Copy, Download, ExternalLink, ShieldCheck, Loader2, Linkedin, Github, Globe } from 'lucide-react';
 import { sound } from '../game/soundEngine';
+import { CERTIFICATE_CONFIG } from '../data/certificateData';
 
 interface VerificationCardProps {
   token: string;
@@ -15,6 +16,7 @@ export const VerificationCard: React.FC<VerificationCardProps> = ({
   onNavigateToVerify,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleCopy = () => {
     sound.playSuccess();
@@ -23,8 +25,17 @@ export const VerificationCard: React.FC<VerificationCardProps> = ({
     setTimeout(() => setCopied(false), 2500);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownload = async () => {
+    if (isDownloading) return;
+    sound.playSuccess();
+    setIsDownloading(true);
+    try {
+      // Loaded on demand so the PDF/QR libraries stay out of the initial bundle.
+      const { downloadCertificatePdf } = await import('../game/certificateGenerator');
+      await downloadCertificatePdf(payload, token);
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   return (
@@ -44,13 +55,16 @@ export const VerificationCard: React.FC<VerificationCardProps> = ({
           </div>
 
           <div className="text-[11px] font-mono tracking-widest uppercase text-[#e3b341] font-bold">
-            Official Course Completion Credential
+            {CERTIFICATE_CONFIG.organization}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            GIT & GITHUB GAME CERTIFICATE
+            {CERTIFICATE_CONFIG.certificateTitle}
           </h1>
+          <p className="text-sm font-bold text-[#58a6ff]">
+            {CERTIFICATE_CONFIG.courseName}
+          </p>
           <p className="text-xs text-[#8b949e] font-mono">
-            Verified Curriculum in Distributed Version Control & Collaboration
+            {CERTIFICATE_CONFIG.certificateSubtitle}
           </p>
         </div>
 
@@ -122,14 +136,62 @@ export const VerificationCard: React.FC<VerificationCardProps> = ({
         </div>
       </div>
 
+      {/* Course author credit */}
+      <div className="flex flex-wrap items-center justify-center gap-4 font-mono text-[11px] text-[#8b949e]">
+        <span>
+          Course created by{' '}
+          <a
+            href={CERTIFICATE_CONFIG.authorLinkedIn}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#58a6ff] hover:underline inline-flex items-center space-x-1"
+          >
+            <Linkedin className="w-3 h-3" />
+            <span>{CERTIFICATE_CONFIG.authorName}</span>
+          </a>
+        </span>
+        <a
+          href={CERTIFICATE_CONFIG.authorGitHub}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#58a6ff] hover:underline inline-flex items-center space-x-1"
+        >
+          <Github className="w-3 h-3" />
+          <span>GitHub</span>
+        </a>
+        <a
+          href={CERTIFICATE_CONFIG.authorWebsite}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#58a6ff] hover:underline inline-flex items-center space-x-1"
+        >
+          <Globe className="w-3 h-3" />
+          <span>theboringedit.in</span>
+        </a>
+        <a
+          href={CERTIFICATE_CONFIG.organizationLinkedIn}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[#58a6ff] hover:underline inline-flex items-center space-x-1"
+        >
+          <Linkedin className="w-3 h-3" />
+          <span>msc-msit</span>
+        </a>
+      </div>
+
       {/* Action Buttons */}
       <div className="flex flex-wrap items-center justify-center gap-3 font-mono text-xs">
         <button
-          onClick={handlePrint}
-          className="flex items-center space-x-2 px-4 py-2 rounded bg-[#21262d] hover:bg-[#30363d] text-white border border-[#30363d] transition shadow"
+          onClick={handleDownload}
+          disabled={isDownloading}
+          className="flex items-center space-x-2 px-5 py-2.5 rounded bg-[#238636] hover:bg-[#2ea043] disabled:opacity-60 text-white font-bold border border-[#2ea043]/40 transition shadow-glow-green"
         >
-          <Printer className="w-4 h-4 text-[#8b949e]" />
-          <span>Print / Save as PDF</span>
+          {isDownloading ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <Download className="w-4 h-4" />
+          )}
+          <span>{isDownloading ? 'Generating PDF...' : 'Download Certificate (PDF)'}</span>
         </button>
 
         {onNavigateToVerify && (

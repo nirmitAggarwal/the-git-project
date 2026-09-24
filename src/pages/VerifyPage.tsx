@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { verifyToken, generateVerificationToken } from '../game/cryptoVerify';
 import { VerificationPayload, VerificationResult } from '../types/verification';
-import { ShieldCheck, CheckCircle2, XCircle, Search, ArrowLeft, Award, Sparkles, Copy, FileText } from 'lucide-react';
+import { ShieldCheck, CheckCircle2, XCircle, Search, ArrowLeft, Award, Sparkles, Download, Loader2 } from 'lucide-react';
 import { sound } from '../game/soundEngine';
 
 interface VerifyPageProps {
@@ -13,6 +13,7 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ onBackToApp, defaultToke
   const [tokenInput, setTokenInput] = useState(defaultToken);
   const [result, setResult] = useState<VerificationResult | null>(null);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const handleVerify = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -31,6 +32,18 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ onBackToApp, defaultToke
         sound.playError();
       }
     }, 400);
+  };
+
+  const handleDownloadCertificate = async () => {
+    if (!result?.isValid || !result.payload || isDownloading) return;
+    sound.playSuccess();
+    setIsDownloading(true);
+    try {
+      const { downloadCertificatePdf } = await import('../game/certificateGenerator');
+      await downloadCertificatePdf(result.payload, tokenInput.trim());
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
   // Generate a test valid credential for demonstration
@@ -197,6 +210,25 @@ export const VerifyPage: React.FC<VerifyPageProps> = ({ onBackToApp, defaultToke
                   <div>
                     Tamper Checksum: <code className="text-[#d29922] font-bold">{result.payload.checksum}</code>
                   </div>
+                </div>
+
+                {/* Certificate download */}
+                <div className="pt-4 border-t border-[#30363d] flex flex-wrap items-center justify-between gap-3">
+                  <span className="text-[11px] text-[#8b949e]">
+                    Regenerate the official A4 landscape PDF certificate for this credential.
+                  </span>
+                  <button
+                    onClick={handleDownloadCertificate}
+                    disabled={isDownloading}
+                    className="px-4 py-2 bg-[#238636] hover:bg-[#2ea043] disabled:opacity-60 text-white font-bold rounded-lg flex items-center space-x-2 transition cursor-pointer"
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
+                    <span>{isDownloading ? 'Generating PDF...' : 'Download Certificate (PDF)'}</span>
+                  </button>
                 </div>
               </div>
             ) : (

@@ -15,8 +15,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   existingName = '',
   existingEmail = '',
 }) => {
-  const [name, setName] = useState(existingName || 'Nirmit');
-  const [email, setEmail] = useState(existingEmail || 'nirmit@example.com');
+  const [name, setName] = useState(existingName);
+  const [email, setEmail] = useState(existingEmail);
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
